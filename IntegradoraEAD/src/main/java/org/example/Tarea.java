@@ -2,7 +2,7 @@ package org.example;
 
 import java.util.Date;
 
-public class Tarea {
+public class Tarea implements Comparable {
 
     private Integer id;
 
@@ -81,6 +81,7 @@ public class Tarea {
     public Tarea() {
 
     }
+
     @Override
     public String toString() {
         return "_________________________________________" + "\n" +
@@ -88,10 +89,37 @@ public class Tarea {
                 "|" + "Descripción: " + descripcion + "|" + "\n" +
                 "|" + "Prioridad: " + prioridad + "|" + "\n" +
                 "|" + "Estatus: " + estatus + "|" + "\n" +
-                "|" + "Fecha: " + fecha + "|"+ "\n" +
+                "|" + "Fecha: " + fecha + "|" + "\n" +
                 "_________________________________________";
     }
 
+    @Override
+    public int compareTo(Object o) {
+        if (this == o) {
+            return 0; // Misma instancia
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            throw new IllegalArgumentException("Se espera una instancia de Tarea");
+        }
+
+        Tarea tarea = (Tarea) o;
+
+        // Comparar titulo
+        int resultadoTitulo = this.titulo.compareTo(tarea.titulo);
+        if (resultadoTitulo != 0) {
+            return resultadoTitulo;
+        }
+
+        // Comparar fechas
+        int resultadoFecha = this.fecha.compareTo(tarea.fecha);
+        if (resultadoFecha != 0) {
+            return resultadoFecha;
+        }
+
+        // Comparar prioridad
+        return this.prioridad.compareTo(tarea.prioridad);
+    }
 }
 
 
