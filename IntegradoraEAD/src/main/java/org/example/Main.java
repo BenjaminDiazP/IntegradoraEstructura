@@ -118,6 +118,7 @@ public class Main {
                                 System.out.println("-----------------");
                                 System.out.println("AGREGAR TAREAS PENDIENTES");
                                 System.out.println("-----------------");
+                                agregarTareasPendientes();
                                 break;
                             case 2:
                                 System.out.println("-----------------");
@@ -201,7 +202,7 @@ public class Main {
         do {
             System.out.println("Fecha (yyyy-MM-dd): ");
             fecha = sc.nextLine();
-        } while (!esFechaValida(fecha, dateFormat) || !esFechaValida2(fecha));
+        } while (!esFechaValida(fecha, dateFormat));
         return fecha;
     }
 
@@ -209,38 +210,35 @@ public class Main {
     public static boolean esFechaValida(String fecha, SimpleDateFormat dateFormat) {
         try {
             Date date = dateFormat.parse(fecha);
+
+            String[] fechaPartes = fecha.split("-");
+            try {
+                int anio = Integer.parseInt(fechaPartes[0]);
+                int mes = Integer.parseInt(fechaPartes[1]);
+                int dia = Integer.parseInt(fechaPartes[2]);
+
+                if (anio < 2023) {
+                    System.out.println("No puedes ingresar un año menor a 2023");
+                    return false;
+                } else if (mes < 1 || mes > 12) {
+                    System.out.println("No puedes ingresar un mes menor a 1 o mayor a 12");
+                    return false;
+                } else if (dia < 1 || dia > 31) {
+                    System.out.println("No puedes ingresar un día menor a 1 o mayor a 31");
+                    return false;
+                } else {
+                    System.out.println("------------------");
+                }
+            } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                System.out.println("Formato de fecha incorrecto. Ingresa la fecha en formato yyyy-MM-dd");
+                return false;
+            }
+
             return true;
         } catch (ParseException e) {
             System.out.println("Error: Ingresa una fecha válida.");
             return false;
         }
-    }
-
-    //Validar cada campo de la fecha
-    public static boolean esFechaValida2(String fecha) {
-        String[] fechaPartes = fecha.split("-");
-        try {
-            int anio = Integer.parseInt(fechaPartes[0]);
-            int mes = Integer.parseInt(fechaPartes[1]);
-            int dia = Integer.parseInt(fechaPartes[2]);
-
-            if (anio < 2023) {
-                System.out.println("No puedes ingresar un año menor a 2023");
-                return false;
-            } else if (mes < 1 || mes > 12) {
-                System.out.println("No puedes ingresar un mes menor a 1 o mayor a 12");
-                return false;
-            } else if (dia < 1 || dia > 31) {
-                System.out.println("No puedes ingresar un día menor a 1 o mayor a 31");
-                return false;
-            } else {
-                System.out.println("------------------");
-            }
-        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-            System.out.println("Formato de fecha incorrecto. Ingresa la fecha en formato yyyy-MM-dd");
-            return false;
-        }
-        return true;
     }
 
     public String validarTitulo() {
@@ -251,7 +249,7 @@ public class Main {
             System.out.println("Titulo: ");
             titulo = sc.nextLine();
 
-            if (titulo.isEmpty()){
+            if (titulo.isEmpty()) {
                 System.out.println("El titulo no puede estar vacio");
                 continue;
             }
@@ -265,7 +263,7 @@ public class Main {
                 }
             }
 
-            if (!tituloValido){
+            if (!tituloValido) {
                 break;
             }
 
@@ -276,12 +274,14 @@ public class Main {
     public String validarDescripcion() {
         TareasDao nuevaLista = new TareasDao();
         LinkedList<Tarea> listaDescripcion = nuevaLista.obtenerTareas();
+
         String descripcion;
+
         do {
             System.out.println("Descripcion: ");
             descripcion = sc.nextLine();
 
-            if (descripcion.isEmpty()){
+            if (descripcion.isEmpty()) {
                 System.out.println("La descripcion no puede estar vacia");
                 continue;
             }
@@ -295,7 +295,7 @@ public class Main {
                 }
             }
 
-            if (!descripcionValida){
+            if (!descripcionValida) {
                 break;
             }
 
@@ -334,43 +334,65 @@ public class Main {
     public void editarTarea() {
         LinkedList<Tarea> listaEditar = tareasDao.obtenerTareas();
         mostrarTareas();
-        System.out.println("Ingresa el indice de la tarea a editar:");
+        System.out.println("Ingresa el índice de la tarea a editar:");
+
         try {
             int indice = sc.nextInt();
-
+            sc.nextLine();
             if (indice >= 1 && indice <= listaEditar.size()) {
                 Tarea tareaAEditar = listaEditar.get(indice - 1);
-                sc.nextLine();
 
-                System.out.println("Título anterior: " + tareaAEditar.getTitulo());
-                String nuevoTitulo = validarTitulo();
-                tareaAEditar.setTitulo(nuevoTitulo);
+                String nuevoTitulo;
+                String nuevaDescripcion;
+                String nuevaFecha;
 
-                System.out.println("Descripción anterior: " + tareaAEditar.getDescripcion());
-                String nuevaDescripcion = validarDescripcion();
-                tareaAEditar.setDescripcion(nuevaDescripcion);
+                do {
+                    System.out.println("Título anterior: " + tareaAEditar.getTitulo());
+                    nuevoTitulo = validarTitulo();
 
-                System.out.println("Fecha anterior: " + tareaAEditar.getFecha());
-                String nuevaFecha = obtenerFecha();
-                tareaAEditar.setFecha(nuevaFecha);
+                    if (nuevoTitulo.equalsIgnoreCase(tareaAEditar.getTitulo())) {
+                        System.out.println("El título no puede ser igual al anterior");
+                    } else {
+                        tareaAEditar.setTitulo(nuevoTitulo);
+                    }
+                } while (nuevoTitulo.equalsIgnoreCase(tareaAEditar.getTitulo()));
+
+                do {
+                    System.out.println("Descripción anterior: " + tareaAEditar.getDescripcion());
+                    nuevaDescripcion = validarDescripcion();
+
+                    if (nuevaDescripcion.equalsIgnoreCase(tareaAEditar.getDescripcion())) {
+                        System.out.println("La descripción no puede ser igual a la anterior");
+                    } else {
+                        tareaAEditar.setDescripcion(nuevaDescripcion);
+                    }
+                } while (nuevaDescripcion.equalsIgnoreCase(tareaAEditar.getDescripcion()));
+
+                do {
+                    System.out.println("Fecha anterior: " + tareaAEditar.getFecha());
+                    nuevaFecha = obtenerFecha();
+                    if (nuevaFecha.equalsIgnoreCase(tareaAEditar.getFecha())) {
+                        System.out.println("La fecha no puede ser igual a la anterior");
+                    } else {
+                        tareaAEditar.setFecha(nuevaFecha);
+                    }
+                } while (nuevaFecha.equalsIgnoreCase(tareaAEditar.getFecha()));
 
                 tareaAEditar.setEstatus("Pendiente");
 
                 if (tareasDao.modificarTarea(tareaAEditar)) {
                     listaEditar.set(indice - 1, tareaAEditar);
-
                     System.out.println("Tarea modificada correctamente");
-
                 } else {
                     System.out.println("Error al modificar la tarea en la base de datos");
                 }
 
             } else {
                 System.out.println("-----------------");
-                System.out.println("Indice invalido. No se puede  modificar la tarea");
+                System.out.println("Índice inválido. No se puede modificar la tarea");
                 System.out.println("-----------------");
             }
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             System.out.println("Error al leer la entrada. Asegúrate de ingresar un número.");
         }
     }
@@ -403,6 +425,24 @@ public class Main {
         }
     }
 
+    private void agregarTareasPendientes() {
+
+        sc.nextLine();
+        String titulo = validarTitulo();
+        String descripcion = validarDescripcion();
+        String prioridad = validarPrioridad();
+        String fecha = obtenerFecha();
+        String estatus = "Pendiente";
+        String resultado = insertarPendientes(titulo, descripcion, prioridad, estatus, fecha);
+        System.out.println(resultado);
+    }
+
+    // Método insertar tareas pendientes
+    public String insertarPendientes(String titulo, String descripcion, String prioridad, String estatus, String fecha) {
+        Tarea nuevaTarea = new Tarea(titulo, descripcion, prioridad, estatus, fecha);
+        tareasP.push(nuevaTarea);
+        return "-----------------<\nTarea agregada correctamente\n-----------------";
+    }
 
     public void completarTareasPendientes() {  //Error aqui cuando entrar se salta la opcion para completar la tarea
 
@@ -459,8 +499,8 @@ public class Main {
         }
     }
 
-    public void agregarTareasProPen(){
-        
+    public void agregarTareasProPen() {
+
     }
 
 
