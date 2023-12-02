@@ -100,12 +100,13 @@ public class Main {
                         try {
                             System.out.println("------ Menú Tareas pendientes/programadas-----");
                             System.out.println("Ingresa la opcion que prefieras");
-                            System.out.println("1. Tareas Pendientes");//pila
-                            System.out.println("2. Tareas Completadas");
-                            System.out.println("3. Tareas Programadas");//colas
-                            System.out.println("4. Mostrar Tareas Programadas");
-                            System.out.println("5. Jerarquía de Prioridades");
-                            System.out.println("6. salir");
+                            System.out.println("1. Agregar tareas");
+                            System.out.println("2. Tareas Pendientes");//pila
+                            System.out.println("3. Tareas Completadas");
+                            System.out.println("4. Tareas Programadas");//colas
+                            System.out.println("5. Mostrar Tareas Programadas");
+                            System.out.println("6. Jerarquía de Prioridades");
+                            System.out.println("7. salir");
                             opc3 = sc.nextInt();
                         } catch (InputMismatchException e) {
                             System.out.println("Error: Ingresa un número entero válido.");
@@ -113,36 +114,40 @@ public class Main {
                             opc3 = 0;
                         }
                         switch (opc3) {
-
                             case 1:
+                                System.out.println("-----------------");
+                                System.out.println("AGREGAR TAREAS PENDIENTES");
+                                System.out.println("-----------------");
+                                break;
+                            case 2:
                                 System.out.println("-----------------");
                                 System.out.println("TAREAS PENDIENTES");
                                 System.out.println("-----------------");
                                 completarTareasPendientes();
                                 break;
-                            case 2:
+                            case 3:
                                 System.out.println("-----------------");
                                 System.out.println("TAREAS COMPLETADAS");
                                 System.out.println("-----------------");
                                 mostrarTareasCompletadas();
                                 break;
-                            case 3:
+                            case 4:
                                 System.out.println("-----------------");
                                 System.out.println("TAREAS PROGRAMADAS");
                                 System.out.println("-----------------");
                                 break;
-                            case 4:
+                            case 5:
                                 System.out.println("-----------------");
                                 System.out.println("MOSTRAR TAREAS PROGRAMAR ");
                                 System.out.println("-----------------");
                                 break;
-                            case 5:
+                            case 6:
                                 // Saber si sera solo de las tareas programdas y de las tareas del dia
                                 System.out.println("-----------------");
                                 System.out.println("CAMBIAR PRIORIDAD DE TAREAS ");
                                 System.out.println("-----------------");
                                 break;
-                            case 6:
+                            case 7:
                                 System.out.println("Saliendo de la gestion");
                                 System.out.println("-----------------");
                                 break;
@@ -150,7 +155,7 @@ public class Main {
                                 System.out.println("Opcion no valida");
                                 System.out.println("-----------------");
                         }
-                    } while (opc3 != 6);
+                    } while (opc3 != 7);
                     break;
                 case 3:
                     System.out.println("Saliendo del programa. ¡Hasta luego!");
@@ -164,11 +169,10 @@ public class Main {
     private void agregarTareas() {
 
         sc.nextLine();
-        System.out.println("Título: ");
-        String titulo = sc.nextLine();
 
-        System.out.println("Descripción: ");
-        String descripcion = sc.nextLine();
+        String titulo = validarTitulo();
+
+        String descripcion = validarDescripcion();
 
         String prioridad = validarPrioridad();
 
@@ -183,10 +187,10 @@ public class Main {
     //Validar Prioridad
     public String validarPrioridad() {
         String prioridad;
-        do{
+        do {
             System.out.println("Prioridad (Alta, Media ó Baja): ");
             prioridad = sc.nextLine().toLowerCase();
-        }while(!prioridad.equals("alta") && !prioridad.equals("media") && !prioridad.equals("baja"));
+        } while (!prioridad.equals("alta") && !prioridad.equals("media") && !prioridad.equals("baja"));
         return prioridad;
     }
 
@@ -239,6 +243,65 @@ public class Main {
         return true;
     }
 
+    public String validarTitulo() {
+        TareasDao nuevaLista = new TareasDao();
+        LinkedList<Tarea> listaTitulo = nuevaLista.obtenerTareas();
+        String titulo;
+        do {
+            System.out.println("Titulo: ");
+            titulo = sc.nextLine();
+
+            if (titulo.isEmpty()){
+                System.out.println("El titulo no puede estar vacio");
+                continue;
+            }
+            boolean tituloValido = false;
+
+            for (Tarea tarea : listaTitulo) {
+                if (titulo.equals(tarea.getTitulo())) {
+                    tituloValido = true;
+                    System.out.println("Titulo ya registrado. Ingresa uno nuevo");
+                    break;
+                }
+            }
+
+            if (!tituloValido){
+                break;
+            }
+
+        } while (true);
+        return titulo;
+    }
+
+    public String validarDescripcion() {
+        TareasDao nuevaLista = new TareasDao();
+        LinkedList<Tarea> listaDescripcion = nuevaLista.obtenerTareas();
+        String descripcion;
+        do {
+            System.out.println("Descripcion: ");
+            descripcion = sc.nextLine();
+
+            if (descripcion.isEmpty()){
+                System.out.println("La descripcion no puede estar vacia");
+                continue;
+            }
+            boolean descripcionValida = false;
+
+            for (Tarea tarea : listaDescripcion) {
+                if (descripcion.equals(tarea.getDescripcion())) {
+                    descripcionValida = true;
+                    System.out.println("Descripcion ya registrada. Ingresa una nueva");
+                    break;
+                }
+            }
+
+            if (!descripcionValida){
+                break;
+            }
+
+        } while (true);
+        return descripcion;
+    }
 
     // Método insertar
     public String insertar(String titulo, String descripcion, String prioridad, String estatus, String fecha) {
@@ -280,23 +343,15 @@ public class Main {
                 sc.nextLine();
 
                 System.out.println("Título anterior: " + tareaAEditar.getTitulo());
-                System.out.print("Nuevo titulo: ");
-                String nuevoTitulo = sc.nextLine();
+                String nuevoTitulo = validarTitulo();
                 tareaAEditar.setTitulo(nuevoTitulo);
 
                 System.out.println("Descripción anterior: " + tareaAEditar.getDescripcion());
-                System.out.print("Nueva descripción: ");
-                String nuevaDescripcion = sc.nextLine();
+                String nuevaDescripcion = validarDescripcion();
                 tareaAEditar.setDescripcion(nuevaDescripcion);
 
-                System.out.println("Prioridad anterior: " + tareaAEditar.getPrioridad());
-                System.out.print("Nueva prioridad (Alta, Media ó Baja): ");
-                String nuevaPrioridad = sc.nextLine();
-                tareaAEditar.setPrioridad(nuevaPrioridad);
-
                 System.out.println("Fecha anterior: " + tareaAEditar.getFecha());
-                System.out.print("Nueva fecha (yyyy-mm-dd): ");
-                String nuevaFecha = sc.nextLine();
+                String nuevaFecha = obtenerFecha();
                 tareaAEditar.setFecha(nuevaFecha);
 
                 tareaAEditar.setEstatus("Pendiente");
@@ -350,6 +405,7 @@ public class Main {
 
 
     public void completarTareasPendientes() {  //Error aqui cuando entrar se salta la opcion para completar la tarea
+
         LinkedList<Tarea> listaP = tareasDao.obtenerTareas();
 
         tareasP = new Stack<>();
@@ -402,5 +458,10 @@ public class Main {
             }
         }
     }
+
+    public void agregarTareasProPen(){
+        
+    }
+
 
 }
