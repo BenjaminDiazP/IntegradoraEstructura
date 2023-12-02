@@ -100,13 +100,12 @@ public class Main {
                         try {
                             System.out.println("------ Menú Tareas pendientes/programadas-----");
                             System.out.println("Ingresa la opcion que prefieras");
-                            System.out.println("1. Agregar tareas");
-                            System.out.println("2. Tareas Pendientes");//pila
-                            System.out.println("3. Tareas Completadas");
-                            System.out.println("4. Tareas Programadas");//colas
-                            System.out.println("5. Mostrar Tareas Programadas");
-                            System.out.println("6. Jerarquía de Prioridades");
-                            System.out.println("7. salir");
+                            System.out.println("1. Agregar tareas"); // Vamos  agreagar las atreas a una pila esa pila va mantenerlas hasta que se meta a la opcion guardar
+                            System.out.println("2. Guardar Tareas"); //Guardar tareas en la base
+                            System.out.println("3. Tareas Pendientes"); //mientras no las mande a guardar debe de decirle un aviso que las debe de guardar // va a mostrar las tareas de ese dia
+                            System.out.println("4. Tareas Programadas"); //mientras no las mande a guardar debe de decirle un aviso que las debe de guardar
+                            System.out.println("5. Tareas Completadas");
+                            System.out.println("6. Salir");
                             opc3 = sc.nextInt();
                         } catch (InputMismatchException e) {
                             System.out.println("Error: Ingresa un número entero válido.");
@@ -122,15 +121,15 @@ public class Main {
                                 break;
                             case 2:
                                 System.out.println("-----------------");
-                                System.out.println("TAREAS PENDIENTES");
+                                System.out.println("GUARDAR TAREAS PENDIENTES");
                                 System.out.println("-----------------");
-                                completarTareasPendientes();
+                                agregarTareasP();
                                 break;
                             case 3:
                                 System.out.println("-----------------");
-                                System.out.println("TAREAS COMPLETADAS");
+                                System.out.println("TAREAS PENDIENTES");
                                 System.out.println("-----------------");
-                                mostrarTareasCompletadas();
+                                completarTareasPendientes();
                                 break;
                             case 4:
                                 System.out.println("-----------------");
@@ -139,16 +138,11 @@ public class Main {
                                 break;
                             case 5:
                                 System.out.println("-----------------");
-                                System.out.println("MOSTRAR TAREAS PROGRAMAR ");
+                                System.out.println("TAREAS COMPLETADAS");
                                 System.out.println("-----------------");
+                                mostrarTareasCompletadas();
                                 break;
                             case 6:
-                                // Saber si sera solo de las tareas programdas y de las tareas del dia
-                                System.out.println("-----------------");
-                                System.out.println("CAMBIAR PRIORIDAD DE TAREAS ");
-                                System.out.println("-----------------");
-                                break;
-                            case 7:
                                 System.out.println("Saliendo de la gestion");
                                 System.out.println("-----------------");
                                 break;
@@ -346,37 +340,17 @@ public class Main {
                 String nuevaDescripcion;
                 String nuevaFecha;
 
-                do {
-                    System.out.println("Título anterior: " + tareaAEditar.getTitulo());
-                    nuevoTitulo = validarTitulo();
+                System.out.println("Título anterior: " + tareaAEditar.getTitulo());
+                nuevoTitulo = validarTitulo();
+                tareaAEditar.setTitulo(nuevoTitulo);
 
-                    if (nuevoTitulo.equalsIgnoreCase(tareaAEditar.getTitulo())) {
-                        System.out.println("El título no puede ser igual al anterior");
-                    } else {
-                        tareaAEditar.setTitulo(nuevoTitulo);
-                    }
-                } while (nuevoTitulo.equalsIgnoreCase(tareaAEditar.getTitulo()));
+                System.out.println("Descripción anterior: " + tareaAEditar.getDescripcion());
+                nuevaDescripcion = validarDescripcion();
+                tareaAEditar.setDescripcion(nuevaDescripcion);
 
-                do {
-                    System.out.println("Descripción anterior: " + tareaAEditar.getDescripcion());
-                    nuevaDescripcion = validarDescripcion();
-
-                    if (nuevaDescripcion.equalsIgnoreCase(tareaAEditar.getDescripcion())) {
-                        System.out.println("La descripción no puede ser igual a la anterior");
-                    } else {
-                        tareaAEditar.setDescripcion(nuevaDescripcion);
-                    }
-                } while (nuevaDescripcion.equalsIgnoreCase(tareaAEditar.getDescripcion()));
-
-                do {
-                    System.out.println("Fecha anterior: " + tareaAEditar.getFecha());
-                    nuevaFecha = obtenerFecha();
-                    if (nuevaFecha.equalsIgnoreCase(tareaAEditar.getFecha())) {
-                        System.out.println("La fecha no puede ser igual a la anterior");
-                    } else {
-                        tareaAEditar.setFecha(nuevaFecha);
-                    }
-                } while (nuevaFecha.equalsIgnoreCase(tareaAEditar.getFecha()));
+                System.out.println("Fecha anterior: " + tareaAEditar.getFecha());
+                nuevaFecha = obtenerFecha();
+                tareaAEditar.setFecha(nuevaFecha);
 
                 tareaAEditar.setEstatus("Pendiente");
 
@@ -426,7 +400,6 @@ public class Main {
     }
 
     private void agregarTareasPendientes() {
-
         sc.nextLine();
         String titulo = validarTitulo();
         String descripcion = validarDescripcion();
@@ -446,28 +419,33 @@ public class Main {
 
     public void completarTareasPendientes() {  //Error aqui cuando entrar se salta la opcion para completar la tarea
 
-        LinkedList<Tarea> listaP = tareasDao.obtenerTareas();
+        TareasDao dao = new TareasDao();
+
+        LinkedList<Tarea> listaP = tareasDao.obtenerTareasP();
 
         tareasP = new Stack<>();
+        tareasC = new Stack<>();
+
+        if (dao.obtenerTareasP().isEmpty()){ // Funciona unicamente si intentas completar una tarea sin haber agregado tareas pendientes
+            System.out.println("No hay tareas pendientes para mostrar");
+            return;
+        }
 
         for (Tarea lista : listaP) {
             if (lista.getEstatus().equals("Pendiente") && !listaP.isEmpty()) {
                 tareasP.push(lista);
             }
-
         }
-
+        sc.nextLine();
         System.out.println(tareasP.peek());
         System.out.print("¿Quieres marcar como completada? (S/N): ");
         String respuesta = sc.nextLine();
 
         if (respuesta.equalsIgnoreCase("S")) {
-            Tarea t = tareasP.pop();
+            Tarea t = tareasP.peek();
             t.setEstatus("Completado");
 
-            if (tareasDao.marcarCompletado(t)) {
-                tareasC.add(t);
-            }
+            tareasDao.marcarCompletado(t);
 
         } else if (respuesta.equalsIgnoreCase("N")) {
 
@@ -480,9 +458,7 @@ public class Main {
 
     public void mostrarTareasCompletadas() {
 
-        LinkedList<Tarea> listaC = tareasDao.obtenerTareas();
-
-        tareasC = new Stack<>();
+        LinkedList<Tarea> listaC = tareasDao.obtenerTareasP();
 
         for (Tarea lista : listaC) {
             if (lista.getEstatus().equals("Completado") && !listaC.isEmpty()) {
@@ -499,8 +475,21 @@ public class Main {
         }
     }
 
-    public void agregarTareasProPen() {
+    public void agregarTareasP() {
 
+        TareasDao dao = new TareasDao();
+        tareasP = new Stack<>();
+
+        if(tareasP.isEmpty()){
+            System.out.println("Ingresa tareas a la lista de pendientes");
+            return;
+        }
+
+        for (Tarea lista : tareasP) {
+            if(lista.getEstatus().equals("Pendiente")){
+                dao.insertarTareaP(lista);
+            }
+        }
     }
 
 

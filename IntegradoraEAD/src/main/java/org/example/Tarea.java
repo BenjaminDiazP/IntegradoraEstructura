@@ -84,13 +84,8 @@ public class Tarea implements Comparable {
 
     @Override
     public String toString() {
-        return "_________________________________________" + "\n" +
-                "|" + "Título: " + titulo + "|" + "\n" +
-                "|" + "Descripción: " + descripcion + "|" + "\n" +
-                "|" + "Prioridad: " + prioridad + "|" + "\n" +
-                "|" + "Estatus: " + estatus + "|" + "\n" +
-                "|" + "Fecha: " + fecha + "|" + "\n" +
-                "_________________________________________";
+        return String.format("Titulo: %s%nDescripcion: %s%nPrioridad: %s%nEstatus: %s%nFecha: %s%n",
+                titulo,descripcion,prioridad,estatus,fecha);
     }
 
     @Override

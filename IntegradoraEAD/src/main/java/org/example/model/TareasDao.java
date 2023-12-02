@@ -50,6 +50,37 @@ public class TareasDao {
         return result;
     }
 
+    //Nuevo metodo
+    public boolean insertarTareaP(Tarea tarea) {
+        boolean result = false;
+        MySqlConector conector = new MySqlConector();
+        Connection connection = conector.connect();
+
+        try {
+            PreparedStatement stmt = connection.prepareStatement(
+                    "INSERT INTO Taskk (title, description, priority, status, date) VALUES (?, ?, ?, ?, ?)"
+            );
+
+            stmt.setString(1, tarea.getTitulo());
+            stmt.setString(2, tarea.getDescripcion());
+            stmt.setString(3, tarea.getPrioridad());
+            stmt.setString(4, tarea.getEstatus());
+            stmt.setString(5, tarea.getFecha());
+
+            if (stmt.executeUpdate() == 1) {
+                result = true;
+            } else {
+                result = false;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error al insertar la tarea: " + e.getMessage());
+        }
+
+        return result;
+    }
+
 
     public boolean eliminarTarea(int id) {
         boolean result = false;
@@ -77,16 +108,16 @@ public class TareasDao {
         return result;
     }
 
-    public LinkedList obtenerTareas(){
+    public LinkedList<Tarea> obtenerTareas() {
         LinkedList<Tarea> tareas = new LinkedList<>();
         MySqlConector conector = new MySqlConector();
         Connection connection = conector.connect();
-        try{
-            PreparedStatement stmt =  connection.prepareStatement(
-                    "SELECT *FROM Task"
-            );
+
+        try {
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Task");
             ResultSet res = stmt.executeQuery();
-            while (res.next()){
+
+            while (res.next()) {
                 Tarea tarea = new Tarea();
                 tarea.setId(res.getInt("id_task"));
                 tarea.setTitulo(res.getString("title"));
@@ -94,16 +125,52 @@ public class TareasDao {
                 tarea.setPrioridad(res.getString("priority"));
                 tarea.setEstatus(res.getString("status"));
                 tarea.setFecha(res.getString("date"));
-
                 tareas.add(tarea);
-
             }
+
         } catch (SQLException e) {
-            System.out.println(".");
+            e.printStackTrace(); // Imprime la excepción para depuración
+            System.out.println("Error al obtener tareas: " + e.getMessage());
+        } finally {
+            conector.closeConnection(connection); // Cerrar la conexion en caso de exception
         }
+
         System.out.println("Número de tareas recuperadas: " + tareas.size());
         return tareas;
     }
+
+    //metodo nuevo
+    public LinkedList<Tarea> obtenerTareasP() {
+        LinkedList<Tarea> tareas = new LinkedList<>();
+        MySqlConector conector = new MySqlConector();
+        Connection connection = conector.connect();
+
+        try {
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Taskk");
+            ResultSet res = stmt.executeQuery();
+
+            while (res.next()) {
+                Tarea tarea = new Tarea();
+                tarea.setId(res.getInt("id_task"));
+                tarea.setTitulo(res.getString("title"));
+                tarea.setDescripcion(res.getString("description"));
+                tarea.setPrioridad(res.getString("priority"));
+                tarea.setEstatus(res.getString("status"));
+                tarea.setFecha(res.getString("date"));
+                tareas.add(tarea);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace(); // Imprime la excepción para depuración
+            System.out.println("Error al obtener tareas: " + e.getMessage());
+        } finally {
+            conector.closeConnection(connection); // Cerrar la conexion en caso de exception
+        }
+
+        System.out.println("Número de tareas recuperadas: " + tareas.size());
+        return tareas;
+    }
+
 
     public boolean modificarTarea(Tarea tarea){
         boolean result = false;
@@ -111,7 +178,8 @@ public class TareasDao {
         Connection connection = conector.connect();
         try{
             PreparedStatement stmt = connection.prepareStatement(
-                    "UPDATE Task SET title = ?, description = ?, priority = ?, status = ?, date = ? WHERE id_task = ?"
+                    "UPDATE Task SET title = ?, description = ?, priority = ?, status = ?, date = ? " +
+                            "WHERE id_task = ?"
             );
             stmt.setString(1, tarea.getTitulo());
             stmt.setString(2, tarea.getDescripcion());
@@ -132,29 +200,30 @@ public class TareasDao {
         return result;
     }
 
-    public boolean marcarCompletado(Tarea tarea){
+    public boolean marcarCompletado(Tarea tarea) {
         MySqlConector conector = new MySqlConector();
-        Connection connnect = conector.connect();
-        try{
-            PreparedStatement stmt = connnect.prepareStatement(
-                    "UPDATE Task SET status = ? WHERE id_task = ?"
-            );
+        Connection connection = conector.connect();
 
-            stmt.setString( 1, tarea.getEstatus());
-            stmt.setInt( 2, tarea.getId());
+        try {
+            PreparedStatement stmt = connection.prepareStatement("UPDATE Task SET status = ? WHERE id_task = ?");
+            stmt.setString(1, tarea.getEstatus());
+            stmt.setInt(2, tarea.getId());
 
-            if (stmt.executeUpdate() == 1){
+            if (stmt.executeUpdate() == 1) {
                 return true;
             } else {
                 return false;
             }
-
-        } catch (SQLException e){
-            e.printStackTrace();
-            System.out.println("No se puede marcar como completada la tarea");
+        } catch (SQLException e) {
+            e.printStackTrace(); // Imprime la excepción para depuración
+            System.out.println("No se puede marcar como completada la tarea: " + e.getMessage());
+        } finally {
+            conector.closeConnection(connection); // Cerrar la conexion en caso de exception
         }
+
         return false;
     }
+
 
 
 

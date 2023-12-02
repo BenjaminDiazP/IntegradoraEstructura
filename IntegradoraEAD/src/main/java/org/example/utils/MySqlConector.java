@@ -40,5 +40,16 @@ public class MySqlConector {
 
     }
 
+    public void closeConnection(Connection connection) {
+        try {
+            if (connection != null && !connection.isClosed()) {
+                connection.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Error al cerrar la conexión: " + e.getMessage());
+        }
+    }
+
 
 }
