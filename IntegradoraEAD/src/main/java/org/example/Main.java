@@ -15,7 +15,7 @@ public class Main {
     LinkedList<Tarea> lista;
     Stack<Tarea> tareasP = new Stack<>(); //Tareas
     Stack<Tarea> tareasC = new Stack<>(); //Tareas completadas
-    Queue<Tarea> tareasProgramadas; //Tareas programadas
+    PriorityQueue<Tarea> tareasProgramadas; //Tareas programadas
 
     //Creacion De Colas y Pilas
 
@@ -71,6 +71,7 @@ public class Main {
                                 System.out.println("AGREGAR TAREA DEL DIA"); // Listo
                                 System.out.println("-----------------");
                                 agregarTareas();
+
                                 break;
                             case 3:
                                 System.out.println("-----------------");
@@ -102,8 +103,8 @@ public class Main {
                             System.out.println("Ingresa la opcion que prefieras");
                             System.out.println("1. Agregar tareas"); // Vamos  agreagar las atreas a una pila esa pila va mantenerlas hasta que se meta a la opcion guardar
                             System.out.println("2. Guardar Tareas"); //Guardar tareas en la base
-                            System.out.println("3. Tareas Pendientes"); //mientras no las mande a guardar debe de decirle un aviso que las debe de guardar // va a mostrar las tareas de ese dia
-                            System.out.println("4. Tareas Programadas"); //mientras no las mande a guardar debe de decirle un aviso que las debe de guardar
+                            System.out.println("3. Tareas Pendientes"); //mientras no las mande a guardar debe de decirle un aviso que las debe de guardar // va a mostrar las tareas de ese dia Pila
+                            System.out.println("4. Tareas Programadas"); //mientras no las mande a guardar debe de decirle un aviso que las debe de guardar //Cola
                             System.out.println("5. Tareas Completadas");
                             System.out.println("6. Salir");
                             opc3 = sc.nextInt();
@@ -117,6 +118,7 @@ public class Main {
                                 System.out.println("-----------------");
                                 System.out.println("AGREGAR TAREAS PENDIENTES");
                                 System.out.println("-----------------");
+                                sc.nextLine();
                                 agregarTareasPendientes();
                                 break;
                             case 2:
@@ -127,7 +129,7 @@ public class Main {
                                 break;
                             case 3:
                                 System.out.println("-----------------");
-                                System.out.println("TAREAS PENDIENTES");
+                                System.out.println("TAREAS PENDIENTES"); // Nos falta hacer que las tareas dependiendo de su prioridad se pongan primerp
                                 System.out.println("-----------------");
                                 completarTareasPendientes();
                                 break;
@@ -135,6 +137,7 @@ public class Main {
                                 System.out.println("-----------------");
                                 System.out.println("TAREAS PROGRAMADAS");
                                 System.out.println("-----------------");
+
                                 break;
                             case 5:
                                 System.out.println("-----------------");
@@ -162,9 +165,7 @@ public class Main {
     }
 
     private void agregarTareas() {
-
         sc.nextLine();
-
         String titulo = validarTitulo();
 
         String descripcion = validarDescripcion();
@@ -464,7 +465,7 @@ public class Main {
     }
 
     private void agregarTareasPendientes() {
-        sc.nextLine();
+
         String titulo = validarTituloP();
         String descripcion = validarDescripcionP();
         String prioridad = validarPrioridad();
@@ -530,16 +531,12 @@ public class Main {
                 return;
             }
         }
-
+        // me  quede aqui
         int opc = 1;
         do {
             Tarea tareaEnLaCima = tareasP.peek();
-            if (tareaEnLaCima != null && tareaEnLaCima.getEstatus().equals("Completado")) {
-                System.out.println("No hay tareas pendientes");
-                opc = 0; // Actualiza opc para salir del bucle
-            } else {
-                // Mostrar tareas pendientes y obtener respuesta
-                System.out.println("Tarea a completar: " + tareasP.peek());
+            if (tareaEnLaCima != null && tareaEnLaCima.getEstatus().equals("Pendiente")) {
+                System.out.println("Tarea a completar: " + "\n" + tareasP.peek());
                 sc.nextLine();
                 System.out.print("¿Quieres marcar como completada? (S/N): ");
                 String respuesta = sc.nextLine();
@@ -555,6 +552,7 @@ public class Main {
                         tareasP.clear();  // Limpiar la pila actual
                         for (Tarea tarea : nuevasTareasP) {
                             tareasP.push(tarea);
+                            opc = 0;
                         }
 
                         System.out.println("Tarea marcada como completada");
@@ -566,11 +564,12 @@ public class Main {
                 } else {
                     System.out.println("Ingresa una respuesta válida");
                 }
+            } else if (tareaEnLaCima != null && tareaEnLaCima.getEstatus().equals("Completado")) {
+                System.out.println("No hay tareas pendientes");
+                opc = 0; // Actualiza opc para salir del bucle
             }
         } while (opc == 1);
-
     }
-
 
 
     public void mostrarTareasCompletadas() {
@@ -590,6 +589,24 @@ public class Main {
                 System.out.println(tarea.toString());
             }
         }
+
+    }
+
+    public  void tareasProgramadas(){
+        TareasDao dao = new TareasDao();
+        //En tareas programas primero debes de pedirle que fecha quiere ver las tareas que son programasdas de ese dia
+        //despues debe de mostrarle las tareas por prioridad
+
+        //1.- Obtener la fecha del dia que quiere ver esas tareas Programadas 1.1.- Validar la fecha
+        System.out.println("Ingresa fecha, para ver las tareas que estan programadas para ese dia");
+        String fecha = obtenerFecha();
+        //2.- Mandar dao en busqueda de atreas que esten pendiente conla la misma fecha que ingreso el usuario
+        LinkedList<Tarea> tareasO = new LinkedList<>();
+        tareasO = dao.obtenerTareasProgramadas(fecha);
+        //2.1 Meter todas las tareas obtenidad a mi lista de prioridad
+
+        //3.-Mostrar en una Queu la lista con esas fechas y mostrar primero las que tengan como prioridad alta
+
     }
 
 

@@ -135,7 +135,7 @@ public class TareasDao {
             conector.closeConnection(connection); // Cerrar la conexion en caso de exception
         }
 
-        System.out.println("Número de tareas recuperadas: " + tareas.size());
+        //System.out.println("Número de tareas recuperadas: " + tareas.size());
         return tareas;
     }
 
@@ -167,7 +167,7 @@ public class TareasDao {
             conector.closeConnection(connection); // Cerrar la conexion en caso de exception
         }
 
-        System.out.println("Número de tareas recuperadas: " + tareas.size());
+       // System.out.println("Número de tareas recuperadas: " + tareas.size());
 
         return tareas;
     }
@@ -248,6 +248,32 @@ public class TareasDao {
     }
 
 
+    public LinkedList<Tarea> obtenerTareasProgramadas(String Fecha){
+        LinkedList<Tarea> tareasP = new LinkedList<>();
+        MySqlConector conector = new MySqlConector();
+        Connection connection = conector.connect();
+
+        try {
+            PreparedStatement stmt = connection.prepareStatement(
+                    "SELECT *FROM Taskk WHERE Fecha = ?"
+            );
+            stmt.setString(1,Fecha);
+            ResultSet res = stmt.executeQuery();
+            while (res.next()){
+                Tarea tarea = new Tarea();
+                tarea.setId(res.getInt("id_task"));
+                tarea.setTitulo(res.getString("title"));
+                tarea.setDescripcion(res.getString("description"));
+                tarea.setPrioridad(res.getString("priority"));
+                tarea.setEstatus(res.getString("status"));
+                tarea.setFecha(res.getString("date"));
+                tareasP.add(tarea);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return tareasP;
+    }
 
     public boolean update(int id, Object object) {
         return false;
