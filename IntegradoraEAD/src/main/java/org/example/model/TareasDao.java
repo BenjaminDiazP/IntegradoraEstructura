@@ -168,6 +168,7 @@ public class TareasDao {
         }
 
         System.out.println("Número de tareas recuperadas: " + tareas.size());
+
         return tareas;
     }
 
@@ -205,7 +206,7 @@ public class TareasDao {
         Connection connection = conector.connect();
 
         try {
-            PreparedStatement stmt = connection.prepareStatement("UPDATE Task SET status = ? WHERE id_task = ?");
+            PreparedStatement stmt = connection.prepareStatement("UPDATE Taskk SET status = ? WHERE id_task = ?");
             stmt.setString(1, tarea.getEstatus());
             stmt.setInt(2, tarea.getId());
 
@@ -224,6 +225,27 @@ public class TareasDao {
         return false;
     }
 
+    public boolean existeTareaConTitulo(String titulo) {
+        MySqlConector conector = new MySqlConector();
+        String sql = "SELECT COUNT(*) FROM taskk WHERE title = ?";
+        try (
+                Connection connection = conector.connect();
+                PreparedStatement statement = connection.prepareStatement(sql)
+        ) {
+            statement.setString(1, titulo);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    int count = resultSet.getInt(1);
+                    return count > 0; // Retorna true si hay al menos una tarea con el mismo título
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Manejo de errores
+        }
+
+        return false; // En caso de error, retornar false
+    }
 
 
 

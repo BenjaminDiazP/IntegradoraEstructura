@@ -13,8 +13,8 @@ public class Main {
 
     //Creacion de la Lista Linkedist
     LinkedList<Tarea> lista;
-    Stack<Tarea> tareasP; //Tareas
-    Stack<Tarea> tareasC; //Tareas completadas
+    Stack<Tarea> tareasP = new Stack<>(); //Tareas
+    Stack<Tarea> tareasC = new Stack<>(); //Tareas completadas
     Queue<Tarea> tareasProgramadas; //Tareas programadas
 
     //Creacion De Colas y Pilas
@@ -399,10 +399,74 @@ public class Main {
         }
     }
 
+//   **************************    Metodos para las tareas pendientes    **************************
+
+    public String validarTituloP() {
+        TareasDao nuevaLista = new TareasDao();
+        LinkedList<Tarea> listaTitulo = nuevaLista.obtenerTareasP();
+        String titulo;
+        do {
+            System.out.println("Titulo: ");
+            titulo = sc.nextLine();
+
+            if (titulo.isEmpty()) {
+                System.out.println("El titulo no puede estar vacio");
+                continue;
+            }
+            boolean tituloValido = false;
+
+            for (Tarea tarea : listaTitulo) {
+                if (titulo.equals(tarea.getTitulo())) {
+                    tituloValido = true;
+                    System.out.println("Titulo ya registrado. Ingresa uno nuevo");
+                    break;
+                }
+            }
+
+            if (!tituloValido) {
+                break;
+            }
+
+        } while (true);
+        return titulo;
+    }
+
+    public String validarDescripcionP() {
+        TareasDao nuevaLista = new TareasDao();
+        LinkedList<Tarea> listaDescripcion = nuevaLista.obtenerTareasP();
+
+        String descripcion;
+
+        do {
+            System.out.println("Descripcion: ");
+            descripcion = sc.nextLine();
+
+            if (descripcion.isEmpty()) {
+                System.out.println("La descripcion no puede estar vacia");
+                continue;
+            }
+            boolean descripcionValida = false;
+
+            for (Tarea tarea : listaDescripcion) {
+                if (descripcion.equals(tarea.getDescripcion())) {
+                    descripcionValida = true;
+                    System.out.println("Descripcion ya registrada. Ingresa una nueva");
+                    break;
+                }
+            }
+
+            if (!descripcionValida) {
+                break;
+            }
+
+        } while (true);
+        return descripcion;
+    }
+
     private void agregarTareasPendientes() {
         sc.nextLine();
-        String titulo = validarTitulo();
-        String descripcion = validarDescripcion();
+        String titulo = validarTituloP();
+        String descripcion = validarDescripcionP();
         String prioridad = validarPrioridad();
         String fecha = obtenerFecha();
         String estatus = "Pendiente";
@@ -417,51 +481,104 @@ public class Main {
         return "-----------------<\nTarea agregada correctamente\n-----------------";
     }
 
-    public void completarTareasPendientes() {  //Error aqui cuando entrar se salta la opcion para completar la tarea
-
+    public void agregarTareasP() {
         TareasDao dao = new TareasDao();
 
+        if (tareasP.isEmpty()) {
+            System.out.println("No hay tareas pendientes para agregar a la base de datos");
+            return;
+        }
+        for (Tarea tarea : tareasP) {
+            if (tarea.getEstatus().equals("Pendiente") && !dao.existeTareaConTitulo(tarea.getTitulo())) {
+                dao.insertarTareaP(tarea);
+            }
+        }
+        System.out.println("Tareas pendientes agregadas correctamente");
+    }
+
+
+    public void completarTareasPendientes() {
         LinkedList<Tarea> listaP = tareasDao.obtenerTareasP();
 
-        tareasP = new Stack<>();
-        tareasC = new Stack<>();
-
-        if (dao.obtenerTareasP().isEmpty()){ // Funciona unicamente si intentas completar una tarea sin haber agregado tareas pendientes
+        if (listaP.isEmpty()) {
             System.out.println("No hay tareas pendientes para mostrar");
             return;
         }
 
-        for (Tarea lista : listaP) {
-            if (lista.getEstatus().equals("Pendiente") && !listaP.isEmpty()) {
-                tareasP.push(lista);
+        // Filtrar las tareas pendientes que ya están en la base de datos
+        for (Tarea tarea : listaP) {
+            if (tarea.getEstatus().equals("Pendiente") && !tareasP.contains(tarea)) {
+                tareasP.push(tarea);
             }
         }
-        sc.nextLine();
-        System.out.println(tareasP.peek());
-        System.out.print("¿Quieres marcar como completada? (S/N): ");
-        String respuesta = sc.nextLine();
 
-        if (respuesta.equalsIgnoreCase("S")) {
-            Tarea t = tareasP.peek();
-            t.setEstatus("Completado");
-
-            tareasDao.marcarCompletado(t);
-
-        } else if (respuesta.equalsIgnoreCase("N")) {
-
-            System.out.println("No se completo la tarea");
-
-        } else {
-            System.out.println("Ingresa una respuesta valida");
+        if (tareasP.isEmpty()) {
+            System.out.println("No hay tareas pendientes para mostrar");
+            return;
         }
+
+        for (Tarea tarea : tareasP) {
+            boolean tareaEnLista = false;
+            for (Tarea tareaLista : listaP) {
+                if (tarea.getTitulo().equals(tareaLista.getTitulo())) {
+                    tareaEnLista = true;
+                    break;
+                }
+            }
+            if (!tareaEnLista) {
+                System.out.println("Agrega tareas a la base de datos.");
+                return;
+            }
+        }
+
+        int opc = 1;
+        do {
+            Tarea tareaEnLaCima = tareasP.peek();
+            if (tareaEnLaCima != null && tareaEnLaCima.getEstatus().equals("Completado")) {
+                System.out.println("No hay tareas pendientes");
+                opc = 0; // Actualiza opc para salir del bucle
+            } else {
+                // Mostrar tareas pendientes y obtener respuesta
+                System.out.println("Tarea a completar: " + tareasP.peek());
+                sc.nextLine();
+                System.out.print("¿Quieres marcar como completada? (S/N): ");
+                String respuesta = sc.nextLine();
+
+                if (respuesta.equalsIgnoreCase("S")) {
+                    if (!tareasP.isEmpty()) {
+                        Tarea t = tareasP.pop();
+                        t.setEstatus("Completado");
+                        tareasDao.marcarCompletado(t);
+
+                        // Actualizar la lista de tareas pendientes después de marcar una tarea como completada
+                        LinkedList<Tarea> nuevasTareasP = new LinkedList<>(tareasDao.obtenerTareasP());
+                        tareasP.clear();  // Limpiar la pila actual
+                        for (Tarea tarea : nuevasTareasP) {
+                            tareasP.push(tarea);
+                        }
+
+                        System.out.println("Tarea marcada como completada");
+                    } else {
+                        System.out.println("La pila de tareas está vacía");
+                    }
+                } else if (respuesta.equalsIgnoreCase("N")) {
+                    System.out.println("No se completó la tarea");
+                } else {
+                    System.out.println("Ingresa una respuesta válida");
+                }
+            }
+        } while (opc == 1);
+
     }
+
+
 
     public void mostrarTareasCompletadas() {
 
         LinkedList<Tarea> listaC = tareasDao.obtenerTareasP();
 
         for (Tarea lista : listaC) {
-            if (lista.getEstatus().equals("Completado") && !listaC.isEmpty()) {
+            if (lista.getEstatus().equals("Completado") && !tareasC.contains(lista)) {
                 tareasC.add(lista);
             }
         }
@@ -471,23 +588,6 @@ public class Main {
         } else {
             for (Tarea tarea : tareasC) {
                 System.out.println(tarea.toString());
-            }
-        }
-    }
-
-    public void agregarTareasP() {
-
-        TareasDao dao = new TareasDao();
-        tareasP = new Stack<>();
-
-        if(tareasP.isEmpty()){
-            System.out.println("Ingresa tareas a la lista de pendientes");
-            return;
-        }
-
-        for (Tarea lista : tareasP) {
-            if(lista.getEstatus().equals("Pendiente")){
-                dao.insertarTareaP(lista);
             }
         }
     }
