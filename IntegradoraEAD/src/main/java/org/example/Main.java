@@ -592,6 +592,7 @@ public class Main {
 
     }
 
+    //Debo de intentar acomodarlo por la prioridad de 1 al 3 por que nececito cambiar ese atributo  para poder hacer el PriorityQueu
     public  void tareasProgramadas(){
         TareasDao dao = new TareasDao();
         //En tareas programas primero debes de pedirle que fecha quiere ver las tareas que son programasdas de ese dia
@@ -604,9 +605,17 @@ public class Main {
         LinkedList<Tarea> tareasO = new LinkedList<>();
         tareasO = dao.obtenerTareasProgramadas(fecha);
         //2.1 Meter todas las tareas obtenidad a mi lista de prioridad
-
+        for (Tarea listaL : tareasO) {
+            tareasProgramadas.add(listaL);
+        }
         //3.-Mostrar en una Queu la lista con esas fechas y mostrar primero las que tengan como prioridad alta
-
+        for(Tarea lisP : tareasProgramadas){
+            System.out.println("Titulo: " + lisP.getTitulo());
+            System.out.println("Descripcion: " + lisP.getDescripcion());
+            System.out.println("Prioridad: " + lisP.getPrioridad());
+            System.out.println("Estatus: " + lisP.getEstatus());
+            System.out.println("Fecha: " + lisP.getFecha());
+        }
     }
 
 
