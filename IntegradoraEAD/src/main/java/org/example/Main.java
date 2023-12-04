@@ -15,7 +15,7 @@ public class Main {
     LinkedList<Tarea> lista;
     Stack<Tarea> tareasP = new Stack<>(); //Tareas
     Stack<Tarea> tareasC = new Stack<>(); //Tareas completadas
-    PriorityQueue<Tarea> tareasProgramadas; //Tareas programadas
+    PriorityQueue<Tarea> tareasProgramadas = new PriorityQueue<>(Comparator.comparing(Tarea::getPrioridad)); //Tareas programadas
 
     //Creacion De Colas y Pilas
 
@@ -137,7 +137,7 @@ public class Main {
                                 System.out.println("-----------------");
                                 System.out.println("TAREAS PROGRAMADAS");
                                 System.out.println("-----------------");
-
+                                tareasProgramadas();
                                 break;
                             case 5:
                                 System.out.println("-----------------");
@@ -486,23 +486,33 @@ public class Main {
         TareasDao dao = new TareasDao();
 
         if (tareasP.isEmpty()) {
-            System.out.println("No hay tareas pendientes para agregar a la base de datos");
+            System.out.println("-----------------");
+            System.out.println("No hay tareas pendientes para agregar a la base de datoooos");
+            System.out.println("-----------------");
             return;
         }
         for (Tarea tarea : tareasP) {
             if (tarea.getEstatus().equals("Pendiente") && !dao.existeTareaConTitulo(tarea.getTitulo())) {
                 dao.insertarTareaP(tarea);
+            } else {
+                System.out.println("-----------------");
+                System.out.println("No hay tareas pendientes para agregar a la base de datos");
+                System.out.println("-----------------");
+                return;
             }
         }
+        System.out.println("-----------------");
         System.out.println("Tareas pendientes agregadas correctamente");
+        System.out.println("-----------------");
     }
-
 
     public void completarTareasPendientes() {
         LinkedList<Tarea> listaP = tareasDao.obtenerTareasP();
 
         if (listaP.isEmpty()) {
+            System.out.println("-----------------");
             System.out.println("No hay tareas pendientes para mostrar");
+            System.out.println("-----------------");
             return;
         }
 
@@ -514,7 +524,9 @@ public class Main {
         }
 
         if (tareasP.isEmpty()) {
+            System.out.println("-----------------");
             System.out.println("No hay tareas pendientes para mostrar");
+            System.out.println("-----------------");
             return;
         }
 
@@ -554,44 +566,107 @@ public class Main {
                             tareasP.push(tarea);
                             opc = 0;
                         }
-
+                        System.out.println("-----------------");
                         System.out.println("Tarea marcada como completada");
+                        System.out.println("-----------------");
                     } else {
+                        System.out.println("-----------------");
                         System.out.println("La pila de tareas está vacía");
+                        System.out.println("-----------------");
                     }
                 } else if (respuesta.equalsIgnoreCase("N")) {
+                    System.out.println("-----------------");
                     System.out.println("No se completó la tarea");
+                    System.out.println("-----------------");
+                    opc = 0;
                 } else {
                     System.out.println("Ingresa una respuesta válida");
                 }
             } else if (tareaEnLaCima != null && tareaEnLaCima.getEstatus().equals("Completado")) {
+                System.out.println("-----------------");
                 System.out.println("No hay tareas pendientes");
                 opc = 0; // Actualiza opc para salir del bucle
             }
         } while (opc == 1);
     }
 
-
     public void mostrarTareasCompletadas() {
+        LinkedList<Tarea> listaC = tareasDao.obtenerTareasP();  // Obtener todas las tareas de la base de datos
 
-        LinkedList<Tarea> listaC = tareasDao.obtenerTareasP();
+        boolean hayTareasNuevas = false;
 
-        for (Tarea lista : listaC) {
-            if (lista.getEstatus().equals("Completado") && !tareasC.contains(lista)) {
-                tareasC.add(lista);
+        for (Tarea tarea : listaC) {
+            if (!contieneTareaConId(tareasC, tarea.getId()) && tarea.getEstatus().equals("Completado")) {
+                tareasC.push(tarea);
+                hayTareasNuevas = true;
             }
         }
 
-        if (tareasC.isEmpty()) {
-            System.out.println("No hay tareas completadas");
-        } else {
-            for (Tarea tarea : tareasC) {
+        if (hayTareasNuevas) {
+            while (!tareasC.isEmpty()) {
+                Tarea tarea = tareasC.pop();
                 System.out.println(tarea.toString());
+                System.out.println("-----------------");
             }
+        } else {
+            System.out.println("No hay tareas completadas");
         }
-
     }
 
+    private boolean contieneTareaConId(Stack<Tarea> stack, int id) {
+        for (Tarea tarea : stack) {
+            if (tarea.getId() == id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void tareasProgramadas() {
+        sc.nextLine();
+        TareasDao dao = new TareasDao();
+
+        // 1.- Validar la fecha
+        System.out.println("Ingresa fecha para ver las tareas programadas para ese día");
+        String fecha = obtenerFecha();
+
+        // 2.- Obtener tareas programadas para esa fecha
+        LinkedList<Tarea> tareasO = dao.obtenerTareasProgramadas(fecha);
+
+        if (tareasO.isEmpty()) {
+            System.out.println("-----------------");
+            System.out.println("No hay tareas programadas para esa fecha");
+            System.out.println("-----------------");
+            return;
+        }
+
+        // 2.1 Meter todas las tareas obtenidas a la PriorityQueue
+        for (Tarea tarea : tareasO) {
+            if (tarea.getEstatus().equals("Pendiente")) {
+                tareasProgramadas.add(tarea);
+            }
+        }
+
+        if (tareasProgramadas.isEmpty()) {
+            System.out.println("-----------------");
+            System.out.println("No hay tareas pendientes programadas para esa fecha");
+            System.out.println("-----------------");
+            return;
+        }
+
+        // 3.- Extraer las tareas de la PriorityQueue a una lista
+        List<Tarea> listaTareasOrdenadas = new ArrayList<>(tareasProgramadas);
+
+        // 4.- Mostrar las tareas en orden de prioridad
+        listaTareasOrdenadas.sort(Comparator.comparing(this::prioridadStringToInteger).reversed());
+
+        for (Tarea tarea : listaTareasOrdenadas) {
+            System.out.println(tarea);
+            System.out.println("--------------------");
+        }
+    }
+
+<<<<<<< HEAD
     //Debo de intentar acomodarlo por la prioridad de 1 al 3 por que nececito cambiar ese atributo  para poder hacer el PriorityQueu
     public  void tareasProgramadas(){
         TareasDao dao = new TareasDao();
@@ -614,9 +689,22 @@ public class Main {
             System.out.println("Descripcion: " + lisP.getDescripcion());
             System.out.println("Prioridad: " + lisP.getPrioridad());
             System.out.println("Estatus: " + lisP.getEstatus());
-            System.out.println("Fecha: " + lisP.getFecha());
+
+    private int prioridadStringToInteger(Tarea tarea) {
+        // Igualar las prioridades "alta", "media", "baja" a valores numéricos
+        switch (tarea.getPrioridad().toLowerCase()) {
+            case "alta":
+                return 3;
+            case "media":
+                return 2;
+            case "baja":
+                return 1;
+            default:
+                return 0; // Manejar el caso por defecto si la prioridad no es reconocida
+
         }
     }
+
 
 
 }
