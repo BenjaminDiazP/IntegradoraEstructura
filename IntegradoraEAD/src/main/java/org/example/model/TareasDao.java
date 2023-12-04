@@ -248,16 +248,16 @@ public class TareasDao {
     }
 
 
-    public LinkedList<Tarea> obtenerTareasProgramadas(String Fecha){
+    public LinkedList<Tarea> obtenerTareasProgramadas(String fecha){
         LinkedList<Tarea> tareasP = new LinkedList<>();
         MySqlConector conector = new MySqlConector();
         Connection connection = conector.connect();
 
         try {
             PreparedStatement stmt = connection.prepareStatement(
-                    "SELECT *FROM Taskk WHERE Fecha = ?"
+                    "SELECT * FROM Taskk WHERE date = ?"
             );
-            stmt.setString(1,Fecha);
+            stmt.setString(1,fecha);
             ResultSet res = stmt.executeQuery();
             while (res.next()){
                 Tarea tarea = new Tarea();
