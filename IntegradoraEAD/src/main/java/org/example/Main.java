@@ -666,30 +666,6 @@ public class Main {
         }
     }
 
-<<<<<<< HEAD
-    //Debo de intentar acomodarlo por la prioridad de 1 al 3 por que nececito cambiar ese atributo  para poder hacer el PriorityQueu
-    public  void tareasProgramadas(){
-        TareasDao dao = new TareasDao();
-        //En tareas programas primero debes de pedirle que fecha quiere ver las tareas que son programasdas de ese dia
-        //despues debe de mostrarle las tareas por prioridad
-
-        //1.- Obtener la fecha del dia que quiere ver esas tareas Programadas 1.1.- Validar la fecha
-        System.out.println("Ingresa fecha, para ver las tareas que estan programadas para ese dia");
-        String fecha = obtenerFecha();
-        //2.- Mandar dao en busqueda de atreas que esten pendiente conla la misma fecha que ingreso el usuario
-        LinkedList<Tarea> tareasO = new LinkedList<>();
-        tareasO = dao.obtenerTareasProgramadas(fecha);
-        //2.1 Meter todas las tareas obtenidad a mi lista de prioridad
-        for (Tarea listaL : tareasO) {
-            tareasProgramadas.add(listaL);
-        }
-        //3.-Mostrar en una Queu la lista con esas fechas y mostrar primero las que tengan como prioridad alta
-        for(Tarea lisP : tareasProgramadas){
-            System.out.println("Titulo: " + lisP.getTitulo());
-            System.out.println("Descripcion: " + lisP.getDescripcion());
-            System.out.println("Prioridad: " + lisP.getPrioridad());
-            System.out.println("Estatus: " + lisP.getEstatus());
-
     private int prioridadStringToInteger(Tarea tarea) {
         // Igualar las prioridades "alta", "media", "baja" a valores numéricos
         switch (tarea.getPrioridad().toLowerCase()) {
@@ -701,10 +677,6 @@ public class Main {
                 return 1;
             default:
                 return 0; // Manejar el caso por defecto si la prioridad no es reconocida
-
         }
     }
-
-
-
 }
