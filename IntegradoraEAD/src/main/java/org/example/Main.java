@@ -17,7 +17,8 @@ public class Main {
     Stack<Tarea> tareasC = new Stack<>(); //Tareas completadas
     PriorityQueue<Tarea> tareasProgramadas = new PriorityQueue<>(Comparator.comparing(Tarea::getPrioridad)); //Tareas programadas
 
-    //Creacion De Colas y Pilas
+    //Variables globales
+    int cont = 0;
 
     Scanner sc = new Scanner(System.in);
 
@@ -465,7 +466,7 @@ public class Main {
     }
 
     private void agregarTareasPendientes() {
-
+        System.out.println(tareasP);
         String titulo = validarTituloP();
         String descripcion = validarDescripcionP();
         String prioridad = validarPrioridad();
@@ -478,32 +479,39 @@ public class Main {
     // Método insertar tareas pendientes
     public String insertarPendientes(String titulo, String descripcion, String prioridad, String estatus, String fecha) {
         Tarea nuevaTarea = new Tarea(titulo, descripcion, prioridad, estatus, fecha);
-        tareasP.push(nuevaTarea);
+            tareasP.push(nuevaTarea);
+        System.out.println(tareasP);
         return "-----------------<\nTarea agregada correctamente\n-----------------";
     }
 
     public void agregarTareasP() {
+        cont=0;
         TareasDao dao = new TareasDao();
 
         if (tareasP.isEmpty()) {
             System.out.println("-----------------");
-            System.out.println("No hay tareas pendientes para agregar a la base de datoooos");
+            System.out.println("No hay tareas pendientes para agregar a la base de dato primer if");
             System.out.println("-----------------");
             return;
         }
+        System.out.println(tareasP);
         for (Tarea tarea : tareasP) {
             if (tarea.getEstatus().equals("Pendiente") && !dao.existeTareaConTitulo(tarea.getTitulo())) {
                 dao.insertarTareaP(tarea);
-            } else {
-                System.out.println("-----------------");
-                System.out.println("No hay tareas pendientes para agregar a la base de datos");
-                System.out.println("-----------------");
-                return;
+                cont = cont + 1;
             }
         }
-        System.out.println("-----------------");
-        System.out.println("Tareas pendientes agregadas correctamente");
-        System.out.println("-----------------");
+        if(cont == 0){
+            System.out.println("-----------------");
+            System.out.println("No hay tareas pendientes para agregar a la base de dato segundo if");
+            System.out.println("-----------------");
+            return;
+        }else if(cont >= 1){
+            System.out.println("-----------------");
+            System.out.println("Tarea pendiente agregada correctamente");
+            System.out.println("-----------------");
+            return;
+        }
     }
 
     public void completarTareasPendientes() {
@@ -516,6 +524,7 @@ public class Main {
             return;
         }
 
+        //infla la tareas p si entro primero a agregar tarea y despues al 3
         // Filtrar las tareas pendientes que ya están en la base de datos
         for (Tarea tarea : listaP) {
             if (tarea.getEstatus().equals("Pendiente") && !tareasP.contains(tarea)) {
@@ -566,6 +575,7 @@ public class Main {
                             tareasP.push(tarea);
                             opc = 0;
                         }
+
                         System.out.println("-----------------");
                         System.out.println("Tarea marcada como completada");
                         System.out.println("-----------------");

@@ -227,7 +227,7 @@ public class TareasDao {
 
     public boolean existeTareaConTitulo(String titulo) {
         MySqlConector conector = new MySqlConector();
-        String sql = "SELECT COUNT(*) FROM taskk WHERE title = ?";
+        String sql = "SELECT *FROM taskk WHERE title = ?";
         try (
                 Connection connection = conector.connect();
                 PreparedStatement statement = connection.prepareStatement(sql)
