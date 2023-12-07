@@ -12,7 +12,6 @@ public class Main {
     TareasDao tareasDao = new TareasDao();
 
     //Creacion de la Lista Linkedist
-    LinkedList<Tarea> lista;
     Stack<Tarea> tareasP = new Stack<>(); //Tareas
     Stack<Tarea> tareasC = new Stack<>(); //Tareas completadas
     PriorityQueue<Tarea> tareasProgramadas = new PriorityQueue<>(Comparator.comparing(Tarea::getPrioridad)); //Tareas programadas
@@ -37,7 +36,8 @@ public class Main {
                 System.out.println("Ingresa la opcion que necesites");
                 System.out.println("1. Menu: Gestionar tareas");
                 System.out.println("2. Menu: Tareas pendientes/programadas");
-                System.out.println("3. Salir");
+                System.out.println("3. Mis tareas");
+                System.out.println("4. Salir");
                 opcion = sc.nextInt();
             } catch (InputMismatchException e) {
                 sc.nextLine();
@@ -69,7 +69,7 @@ public class Main {
                                 break;
                             case 2:
                                 System.out.println("-----------------");
-                                System.out.println("AGREGAR TAREA DEL DIA"); // Listo
+                                System.out.println("AGREGAR TAREA"); // Listo
                                 System.out.println("-----------------");
                                 agregarTareas();
 
@@ -157,12 +157,18 @@ public class Main {
                     } while (opc3 != 7);
                     break;
                 case 3:
+                    System.out.println("-----------------");
+                    System.out.println("MIS TAREAS");
+                    misTareas();
+                    System.out.println("-----------------");
+                    break;
+                case 4:
                     System.out.println("Saliendo del programa. ¡Hasta luego!");
                     break;
                 default:
                     System.out.println("Opcion no valida. Inténtelo de nuevo.");
             }
-        } while (opcion != 3);
+        } while (opcion != 4);
     }
 
     private void agregarTareas() {
@@ -689,4 +695,56 @@ public class Main {
                 return 0; // Manejar el caso por defecto si la prioridad no es reconocida
         }
     }
+
+    public void misTareas() {
+        TreeSet<Tarea> tareas = tareasDao.treeTareas();
+        System.out.println("¿Cómo deseas ver tus tareas?\n1. Por fecha\n2. Por prioridad\n3. Por título");
+        int opcion = sc.nextInt();
+        sc.nextLine();
+
+        switch (opcion) {
+            case 1:
+                mostrarTareasPorFecha(tareas);
+                break;
+            case 2:
+                mostrarTareasPorPrioridad(tareas);
+                break;
+            case 3:
+                mostrarTareasPorTitulo(tareas);
+                break;
+            default:
+                System.out.println("Opción no válida.");
+        }
+
+    }
+
+    private void mostrarTareasPorPrioridad(TreeSet<Tarea> tareas) {
+        TreeSet<Tarea> tareasPorPrioridad = new TreeSet<>();
+        tareasPorPrioridad.addAll(tareas);
+        System.out.println("Tareas ordenadas por prioridad:");
+        for (Tarea tarea : tareasPorPrioridad) {
+
+            System.out.println(tarea);
+        }
+    }
+
+    private void mostrarTareasPorTitulo(TreeSet<Tarea> tareas) {
+        TreeSet<Tarea> tareasPorTitulo = new TreeSet<>(Comparator.comparing(Tarea::getTitulo));
+        tareasPorTitulo.addAll(tareas);
+        System.out.println("Tareas ordenadas por título:");
+        for (Tarea tarea : tareasPorTitulo) {
+            System.out.println(tarea);
+        }
+    }
+
+    private void mostrarTareasPorFecha(TreeSet<Tarea> tareas) {
+        TreeSet<Tarea> tareasPorFechas = new TreeSet<>(Comparator.comparing(Tarea::getFecha)
+                .thenComparing(Tarea::getTitulo));
+        tareasPorFechas.addAll(tareas);
+        System.out.println("Tareas ordenadas por fecha:");
+        for (Tarea tarea : tareasPorFechas) {
+            System.out.println(tarea);
+        }
+    }
+
 }

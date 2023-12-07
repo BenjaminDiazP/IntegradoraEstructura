@@ -2,7 +2,7 @@ package org.example;
 
 import java.util.Date;
 
-public class Tarea implements Comparable {
+public class Tarea implements Comparable<Tarea> {
 
     private Integer id;
 
@@ -89,31 +89,35 @@ public class Tarea implements Comparable {
     }
 
     @Override
-    public int compareTo(Object o) {
-        if (this == o) {
-            return 0; // Misma instancia
+    public int compareTo(Tarea tarea) {
+        int comparacionPrioridad = compararPrioridades(this.prioridad, tarea.prioridad);
+        if (comparacionPrioridad != 0) {
+            return comparacionPrioridad;
         }
 
-        if (o == null || getClass() != o.getClass()) {
-            throw new IllegalArgumentException("Se espera una instancia de Tarea");
+        int comparacionFechas = this.fecha.compareTo(tarea.fecha);
+        if (comparacionFechas != 0) {
+            return comparacionFechas;
         }
 
-        Tarea tarea = (Tarea) o;
 
-        // Comparar titulo
-        int resultadoTitulo = this.titulo.compareTo(tarea.titulo);
-        if (resultadoTitulo != 0) {
-            return resultadoTitulo;
+
+        return this.titulo.compareTo(tarea.titulo);
+
+    }
+
+    private int compararPrioridades(String prioridad1, String prioridad2) {
+        if (prioridad1.equals("alta")) {
+            return -1;
+        } else if (prioridad2.equals("alta")) {
+            return 1;
+        } else if (prioridad1.equals("media")) {
+            return -1;
+        } else if (prioridad2.equals("media")) {
+            return 1;
+        } else {
+            return 0;
         }
-
-        // Comparar fechas
-        int resultadoFecha = this.fecha.compareTo(tarea.fecha);
-        if (resultadoFecha != 0) {
-            return resultadoFecha;
-        }
-
-        // Comparar prioridad
-        return this.prioridad.compareTo(tarea.prioridad);
     }
 }
 

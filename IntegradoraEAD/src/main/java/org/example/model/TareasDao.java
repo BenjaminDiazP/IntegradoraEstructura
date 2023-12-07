@@ -7,18 +7,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TreeSet;
 
 public class TareasDao {
-
-
-    public List<Tarea> findAll() {
-        List<Tarea> listaTareas = new ArrayList<>();
-
-        return listaTareas;
-    }
 
     public boolean insertarTarea(Tarea tarea) {
         boolean result = false;
@@ -58,7 +53,7 @@ public class TareasDao {
 
         try {
             PreparedStatement stmt = connection.prepareStatement(
-                    "INSERT INTO Taskk (title, description, priority, status, date) VALUES (?, ?, ?, ?, ?)"
+                    "INSERT INTO Task (title, description, priority, status, date) VALUES (?, ?, ?, ?, ?)"
             );
 
             stmt.setString(1, tarea.getTitulo());
@@ -146,7 +141,7 @@ public class TareasDao {
         Connection connection = conector.connect();
 
         try {
-            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Taskk");
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Task");
             ResultSet res = stmt.executeQuery();
 
             while (res.next()) {
@@ -206,7 +201,7 @@ public class TareasDao {
         Connection connection = conector.connect();
 
         try {
-            PreparedStatement stmt = connection.prepareStatement("UPDATE Taskk SET status = ? WHERE id_task = ?");
+            PreparedStatement stmt = connection.prepareStatement("UPDATE Task SET status = ? WHERE id_task = ?");
             stmt.setString(1, tarea.getEstatus());
             stmt.setInt(2, tarea.getId());
 
@@ -227,7 +222,7 @@ public class TareasDao {
 
     public boolean existeTareaConTitulo(String titulo) {
         MySqlConector conector = new MySqlConector();
-        String sql = "SELECT *FROM taskk WHERE title = ?";
+        String sql = "SELECT *FROM task WHERE title = ?";
         try (
                 Connection connection = conector.connect();
                 PreparedStatement statement = connection.prepareStatement(sql)
@@ -255,7 +250,7 @@ public class TareasDao {
 
         try {
             PreparedStatement stmt = connection.prepareStatement(
-                    "SELECT * FROM Taskk WHERE date = ?"
+                    "SELECT * FROM Task WHERE date = ?"
             );
             stmt.setString(1,fecha);
             ResultSet res = stmt.executeQuery();
@@ -275,12 +270,31 @@ public class TareasDao {
         return tareasP;
     }
 
-    public boolean update(int id, Object object) {
-        return false;
-    }
+    public TreeSet treeTareas(){
+        TreeSet<Tarea> tareas = new TreeSet<>();
+        MySqlConector conector = new MySqlConector();
+        Connection connection = conector.connect();
+        try{
+            PreparedStatement stmt =  connection.prepareStatement(
+                    "SELECT *FROM Task"
+            );
+            ResultSet res = stmt.executeQuery();
+            while (res.next()){
+                Tarea tarea = new Tarea();
+                tarea.setId(res.getInt("id_task"));
+                tarea.setTitulo(res.getString("title"));
+                tarea.setDescripcion(res.getString("description"));
+                tarea.setPrioridad(res.getString("priority"));
+                tarea.setEstatus(res.getString("status"));
+                tarea.setFecha(res.getString("date"));
 
-    public Object findOne(int id) {
-        return null;
+                tareas.add(tarea);
+
+            }
+        } catch (SQLException e) {
+            System.out.println(".");
+        }
+        return tareas;
     }
 
 
