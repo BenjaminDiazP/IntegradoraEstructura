@@ -485,13 +485,13 @@ public class Main {
     // Método insertar tareas pendientes
     public String insertarPendientes(String titulo, String descripcion, String prioridad, String estatus, String fecha) {
         Tarea nuevaTarea = new Tarea(titulo, descripcion, prioridad, estatus, fecha);
-            tareasP.push(nuevaTarea);
+        tareasP.push(nuevaTarea);
         System.out.println(tareasP);
         return "-----------------<\nTarea agregada correctamente\n-----------------";
     }
 
     public void agregarTareasP() {
-        cont=0;
+        cont = 0;
         TareasDao dao = new TareasDao();
 
         if (tareasP.isEmpty()) {
@@ -507,12 +507,12 @@ public class Main {
                 cont = cont + 1;
             }
         }
-        if(cont == 0){
+        if (cont == 0) {
             System.out.println("-----------------");
             System.out.println("No hay tareas pendientes para agregar a la base de dato segundo if");
             System.out.println("-----------------");
             return;
-        }else if(cont >= 1){
+        } else if (cont >= 1) {
             System.out.println("-----------------");
             System.out.println("Tarea pendiente agregada correctamente");
             System.out.println("-----------------");
@@ -721,19 +721,30 @@ public class Main {
     private void mostrarTareasPorPrioridad(TreeSet<Tarea> tareas) {
         TreeSet<Tarea> tareasPorPrioridad = new TreeSet<>();
         tareasPorPrioridad.addAll(tareas);
-        System.out.println("Tareas ordenadas por prioridad:");
-        for (Tarea tarea : tareasPorPrioridad) {
+        if (tareasPorPrioridad.isEmpty()) {
+            System.out.println("No hay tareas para mostrar.");
+            return;
+        } else {
+            System.out.println("Tareas ordenadas por prioridad:");
+            for (Tarea tarea : tareasPorPrioridad) {
 
-            System.out.println(tarea);
+                System.out.println(tarea);
+            }
         }
+
     }
 
     private void mostrarTareasPorTitulo(TreeSet<Tarea> tareas) {
         TreeSet<Tarea> tareasPorTitulo = new TreeSet<>(Comparator.comparing(Tarea::getTitulo));
         tareasPorTitulo.addAll(tareas);
-        System.out.println("Tareas ordenadas por título:");
-        for (Tarea tarea : tareasPorTitulo) {
-            System.out.println(tarea);
+        if (tareasPorTitulo.isEmpty()) {
+            System.out.println("No hay tareas para mostrar.");
+            return;
+        } else {
+            System.out.println("Tareas ordenadas por título:");
+            for (Tarea tarea : tareasPorTitulo) {
+                System.out.println(tarea);
+            }
         }
     }
 
@@ -741,9 +752,14 @@ public class Main {
         TreeSet<Tarea> tareasPorFechas = new TreeSet<>(Comparator.comparing(Tarea::getFecha)
                 .thenComparing(Tarea::getTitulo));
         tareasPorFechas.addAll(tareas);
-        System.out.println("Tareas ordenadas por fecha:");
-        for (Tarea tarea : tareasPorFechas) {
-            System.out.println(tarea);
+        if (tareasPorFechas.isEmpty()) {
+            System.out.println("No hay tareas para mostrar.");
+            return;
+        } else {
+            System.out.println("Tareas ordenadas por fecha:");
+            for (Tarea tarea : tareasPorFechas) {
+                System.out.println(tarea);
+            }
         }
     }
 

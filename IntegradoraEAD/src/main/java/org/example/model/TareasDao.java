@@ -53,7 +53,7 @@ public class TareasDao {
 
         try {
             PreparedStatement stmt = connection.prepareStatement(
-                    "INSERT INTO Task (title, description, priority, status, date) VALUES (?, ?, ?, ?, ?)"
+                    "INSERT INTO Taskk (title, description, priority, status, date) VALUES (?, ?, ?, ?, ?)"
             );
 
             stmt.setString(1, tarea.getTitulo());
@@ -141,7 +141,7 @@ public class TareasDao {
         Connection connection = conector.connect();
 
         try {
-            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Task");
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Taskk");
             ResultSet res = stmt.executeQuery();
 
             while (res.next()) {
@@ -201,7 +201,7 @@ public class TareasDao {
         Connection connection = conector.connect();
 
         try {
-            PreparedStatement stmt = connection.prepareStatement("UPDATE Task SET status = ? WHERE id_task = ?");
+            PreparedStatement stmt = connection.prepareStatement("UPDATE Taskk SET status = ? WHERE id_task = ?");
             stmt.setString(1, tarea.getEstatus());
             stmt.setInt(2, tarea.getId());
 
@@ -222,7 +222,7 @@ public class TareasDao {
 
     public boolean existeTareaConTitulo(String titulo) {
         MySqlConector conector = new MySqlConector();
-        String sql = "SELECT *FROM task WHERE title = ?";
+        String sql = "SELECT *FROM taskk WHERE title = ?";
         try (
                 Connection connection = conector.connect();
                 PreparedStatement statement = connection.prepareStatement(sql)
@@ -250,7 +250,7 @@ public class TareasDao {
 
         try {
             PreparedStatement stmt = connection.prepareStatement(
-                    "SELECT * FROM Task WHERE date = ?"
+                    "SELECT * FROM Taskk WHERE date = ?"
             );
             stmt.setString(1,fecha);
             ResultSet res = stmt.executeQuery();
